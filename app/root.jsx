@@ -59,13 +59,14 @@ export const loader = async ({ request, context }) => {
       maxAge: 604_800,
       path: '/',
       sameSite: 'lax',
-      secrets: [context.cloudflare.env.SESSION_SECRET || ' '],
+      secrets: [process.env.SESSION_SECRET || ' '],
       secure: true,
     },
   });
 
   const session = await getSession(request.headers.get('Cookie'));
-  const theme = session.get('theme') || 'dark';
+  // Keep light theme code for future, but disable it in the UI by forcing dark.
+  const theme = 'dark';
 
   return json(
     { canonicalUrl, theme },
@@ -82,9 +83,7 @@ export default function App() {
   const fetcher = useFetcher();
   const { state } = useNavigation();
 
-  if (fetcher.formData?.has('theme')) {
-    theme = fetcher.formData.get('theme');
-  }
+  // Ignore any theme form submissions to keep the UI dark-only.
 
   function toggleTheme(newTheme) {
     fetcher.submit(
@@ -109,7 +108,7 @@ export default function App() {
         <meta name="theme-color" content={theme === 'dark' ? '#111' : '#F2F2F2'} />
         <meta
           name="color-scheme"
-          content={theme === 'light' ? 'light dark' : 'dark light'}
+          content="dark"
         />
         <style dangerouslySetInnerHTML={{ __html: themeStyles }} />
         <Meta />
@@ -148,7 +147,7 @@ export function ErrorBoundary() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#111" />
-        <meta name="color-scheme" content="dark light" />
+        <meta name="color-scheme" content="dark" />
         <style dangerouslySetInnerHTML={{ __html: themeStyles }} />
         <Meta />
         <Links />

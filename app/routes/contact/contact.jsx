@@ -30,15 +30,45 @@ const MAX_EMAIL_LENGTH = 512;
 const MAX_MESSAGE_LENGTH = 4096;
 const EMAIL_PATTERN = /(.+)@(.+){2,}\.(.+){2,}/;
 
-export async function action({ context, request }) {
-  const ses = new SESClient({
-    region: 'us-east-1',
-    credentials: {
-      accessKeyId: context.cloudflare.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: context.cloudflare.env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
+async function appendSubmissionToJsonFile({ email, message, request }) {
+  // Cloudflare runtime doesn't support filesystem writes; only enable when running in Node locally.
+  const isNode =
+    typeof process !== 'undefined' && Boolean(process.versions?.node) && typeof window === 'undefined';
+  if (!isNode) return;
 
+  const { mkdir, readFile, writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+
+  const dir = join(process.cwd(), 'data');
+  const filePath = join(dir, 'contact-submissions.json');
+
+  await mkdir(dir, { recursive: true });
+
+  const entry = {
+    timestamp: new Date().toISOString(),
+    email,
+    message,
+    ip:
+      request.headers.get('CF-Connecting-IP') ||
+      request.headers.get('X-Forwarded-For') ||
+      undefined,
+    userAgent: request.headers.get('User-Agent') || undefined,
+  };
+
+  let existing = [];
+  try {
+    const raw = await readFile(filePath, 'utf8');
+    existing = JSON.parse(raw);
+    if (!Array.isArray(existing)) existing = [];
+  } catch {
+    existing = [];
+  }
+
+  existing.push(entry);
+  await writeFile(filePath, JSON.stringify(existing, null, 2), 'utf8');
+}
+
+export async function action({ context, request }) {
   const formData = await request.formData();
   const isBot = String(formData.get('name'));
   const email = String(formData.get('email'));
@@ -69,28 +99,50 @@ export async function action({ context, request }) {
     return json({ errors });
   }
 
-  // Send email via Amazon SES
-  await ses.send(
-    new SendEmailCommand({
-      Destination: {
-        ToAddresses: [context.cloudflare.env.EMAIL],
+  // Append to local JSON log (Node only; no-op on Cloudflare).
+  await appendSubmissionToJsonFile({ email, message, request });
+
+  const env = context?.cloudflare?.env;
+  const canEmail =
+    Boolean(env?.AWS_ACCESS_KEY_ID) &&
+    Boolean(env?.AWS_SECRET_ACCESS_KEY) &&
+    Boolean(env?.EMAIL) &&
+    Boolean(env?.FROM_EMAIL);
+
+  // Send email via Amazon SES (only if credentials are configured)
+  if (canEmail) {
+    const ses = new SESClient({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
       },
-      Message: {
-        Body: {
-          Text: {
-            Data: `From: ${email}\n\n${message}`,
+    });
+
+    await ses.send(
+      new SendEmailCommand({
+        Destination: {
+          ToAddresses: [env.EMAIL],
+        },
+        Message: {
+          Body: {
+            Text: {
+              Data: `From: ${email}\n\n${message}`,
+            },
+          },
+          Subject: {
+            Data: `Portfolio message from ${email}`,
           },
         },
-        Subject: {
-          Data: `Portfolio message from ${email}`,
-        },
-      },
-      Source: `Portfolio <${context.cloudflare.env.FROM_EMAIL}>`,
-      ReplyToAddresses: [email],
-    })
-  );
+        Source: `Portfolio <${env.FROM_EMAIL}>`,
+        ReplyToAddresses: [email],
+      })
+    );
 
-  return json({ success: true });
+    return json({ success: true, emailed: true });
+  }
+
+  return json({ success: true, emailed: false });
 }
 
 export const Contact = () => {

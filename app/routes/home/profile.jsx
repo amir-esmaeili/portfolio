@@ -1,18 +1,16 @@
-import profileImgLarge from '~/assets/profile-large.jpg';
+import profileImgLarge from '~/assets/amir-large.png';
 import profileImgPlaceholder from '~/assets/profile-placeholder.jpg';
-import profileImg from '~/assets/profile.jpg';
+import profileImg from '~/assets/amir.png';
 import { Button } from '~/components/button';
 import { DecoderText } from '~/components/decoder-text';
 import { Divider } from '~/components/divider';
 import { Heading } from '~/components/heading';
 import { Image } from '~/components/image';
-import { Link } from '~/components/link';
 import { Section } from '~/components/section';
 import { Text } from '~/components/text';
 import { Transition } from '~/components/transition';
 import { Fragment, useState } from 'react';
 import { media } from '~/utils/style';
-import katakana from './katakana.svg';
 import styles from './profile.module.css';
 
 const ProfileText = ({ visible, titleId }) => (
@@ -21,17 +19,19 @@ const ProfileText = ({ visible, titleId }) => (
       <DecoderText text="Hi there" start={visible} delay={500} />
     </Heading>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
-      I’m Hamish, currently I live in Sydney working as a senior product designer at{' '}
-      <Link href="https://www.qwilr.com">Qwilr</Link>. My projects include UX design, UI
-      animations, and icon illustration. Being comfortable with code allows me to rapidly
-      prototype and validate experiences. If you’re interested in the tools and software I
-      use check out my <Link href="/uses">uses page</Link>.
+      I’m Amir, an AI/ML Engineer with backend expertise, focused on deploying production-grade
+      machine learning systems and scalable APIs. I’m based in Tabriz, Iran and open to relocation.
     </Text>
     <Text className={styles.description} data-visible={visible} size="l" as="p">
-      In my spare time I like to practice Brazilian Jiu Jitsu, play video games, and{' '}
-      <Link href="/projects/volkihar-knight">make mods</Link>. I’m always down for hearing
-      about new projects, so feel free to drop me a line.
+      Recently I engineered AI optimization models for logistics operations that reduced service
+      delays by 30% and helped cut operational costs across 100+ service points, and integrated ML
+      models into production systems for real-time decision-making. I also have experience building
+      secure microservices and high-traffic APIs (Django, Laravel, PostgreSQL, Redis).
     </Text>
+    {/* <Text className={styles.description} data-visible={visible} size="l" as="p">
+      I’m currently pursuing an M.Sc. in Soft Computing and Artificial Intelligence at the
+      University of Tabriz (full scholarship).
+    </Text> */}
   </Fragment>
 );
 
@@ -86,11 +86,8 @@ export const Profile = ({ id, visible, sectionRef }) => {
                   width={960}
                   height={1280}
                   sizes={`(max-width: ${media.mobile}px) 100vw, 480px`}
-                  alt="Me smiling like a goofball at the Qwilr office in Sydney"
+                  alt="Portrait photo"
                 />
-                <svg className={styles.svg} data-visible={visible} viewBox="0 0 136 766">
-                  <use href={`${katakana}#katakana-profile`} />
-                </svg>
               </div>
             </div>
           </div>

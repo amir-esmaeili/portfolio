@@ -4,7 +4,6 @@ import GothamBookItalic from '~/assets/fonts/gotham-book-italic.woff2';
 import GothamBook from '~/assets/fonts/gotham-book.woff2';
 import GothamMediumItalic from '~/assets/fonts/gotham-medium-italic.woff2';
 import GothamMedium from '~/assets/fonts/gotham-medium.woff2';
-import IPAGothic from '~/assets/fonts/ipa-gothic.woff2';
 import { createContext, useContext } from 'react';
 import { classes, media } from '~/utils/style';
 import { themes, tokens } from './theme';
@@ -164,13 +163,6 @@ const fontStyles = squish(`
     font-style: italic;
   }
 
-  @font-face {
-    font-family: IPA Gothic;
-    font-weight: 400;
-    src: url(${IPAGothic}) format('woff2');
-    font-display: swap;
-    font-style: normal;
-  }
 `);
 
 export const themeStyles = squish(`

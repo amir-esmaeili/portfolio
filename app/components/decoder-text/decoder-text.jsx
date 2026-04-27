@@ -5,23 +5,11 @@ import { delay } from '~/utils/delay';
 import { classes } from '~/utils/style';
 import styles from './decoder-text.module.css';
 
-// prettier-ignore
+// Keep glyphs ASCII-only to avoid any non-Latin characters in the UI.
 const glyphs = [
-  'ア', 'イ', 'ウ', 'エ', 'オ',
-  'カ', 'キ', 'ク', 'ケ', 'コ',
-  'サ', 'シ', 'ス', 'セ', 'ソ',
-  'タ', 'チ', 'ツ', 'テ', 'ト',
-  'ナ', 'ニ', 'ヌ', 'ネ', 'ノ',
-  'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
-  'マ', 'ミ', 'ム', 'メ', 'モ',
-  'ヤ', 'ユ', 'ヨ', 'ー',
-  'ラ', 'リ', 'ル', 'レ', 'ロ',
-  'ワ', 'ヰ', 'ヱ', 'ヲ', 'ン',
-  'ガ', 'ギ', 'グ', 'ゲ', 'ゴ',
-  'ザ', 'ジ', 'ズ', 'ゼ', 'ゾ',
-  'ダ', 'ヂ', 'ヅ', 'デ', 'ド',
-  'バ', 'ビ', 'ブ', 'ベ', 'ボ',
-  'パ', 'ピ', 'プ', 'ペ', 'ポ',
+  ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  ...'0123456789',
+  ...'!@#$%^&*()_+-=[]{};:,.?/\\|',
 ];
 
 const CharType = {
