@@ -149,7 +149,8 @@ export const Navbar = () => {
         aria-label={`${config.name}, ${config.role}`}
         onClick={handleMobileNavClick}
       >
-        <Monogram highlight />
+        {/* <Monogram highlight /> */}
+        <img src="/icon.svg" alt="Logo" className={styles.logoImage} />
       </RouterLink>
       <NavToggle onClick={() => setMenuOpen(!menuOpen)} menuOpen={menuOpen} />
       <nav className={styles.nav}>
